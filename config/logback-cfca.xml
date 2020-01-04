@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" nolog="true" scanPeriod="60 seconds">
+
+	<contextName>algorithm</contextName>
+
+	<property name="logging_home" value="/var/log/algorithm" />
+	<property name="logging_backup_home" value="${logging_home}/backup" />
+
+	<!-- 控制台输出 -->
+	<appender name="STDOUT" class="cfca.ch.qos.logback.core.ConsoleAppender">
+		<encoder class="cfca.ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+			<pattern>%magenta(%d{yyyy-MM-dd HH:mm:ss}) %p %boldCyan([%thread]) %boldYellow(%logger{50}):%boldGreen(%L) %highlight(%msg%n)</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILEROLLING" class="cfca.ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logging_home}/algorithm.log</file>
+
+		<rollingPolicy class="cfca.ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<FileNamePattern>
+				${logging_backup_home}/%d{yyyy-MM-dd}/algorithm.%d{yyyyMMdd}.%i.log.zip
+			</FileNamePattern>
+			<maxHistory>30</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+		</rollingPolicy>
+		<layout class="cfca.ch.qos.logback.classic.PatternLayout">
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n
+			</pattern>
+		</layout>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="FILEROLLING" />
+	</root>
+
+</configuration>
