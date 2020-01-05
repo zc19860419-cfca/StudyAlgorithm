@@ -9,8 +9,8 @@ import com.sadk.algorithm.utils.Debugger;
  * @Author: zhangchong
  * @Description: 循环版本的二分搜索优化
  */
-public class ThrowEggLoopBinarySearchDP implements ThrowEggDP {
-    private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopBinarySearchDP.class);
+public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
+    private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopOptimizeStateTransitionDP.class);
     private int state[][];
     private static long count = 0L;
 
@@ -52,7 +52,7 @@ public class ThrowEggLoopBinarySearchDP implements ThrowEggDP {
                     drop = low + (high - low) / 2;           // throw egg at drop-th floor
                     brokenCase = state[egg - 1][drop - 1];  // eggs broken (worst case minimum number)
                     notBrokenCase = state[egg][floor - drop];// eggs not broken (worst case minimum number)
-                    if (brokenCase > notBrokenCase) {
+                    if (brokenCase >= notBrokenCase) {
                         high = drop - 1;
                         result = Math.min(result, brokenCase + 1);
                     } else {
@@ -60,18 +60,6 @@ public class ThrowEggLoopBinarySearchDP implements ThrowEggDP {
                         result = Math.min(result, notBrokenCase + 1);
                     }
                 }
-//                //线性搜索
-//                for (int drop = 1; drop <= floor; drop++) {
-//                    count++;
-//                    //在第 drop 层扔鸡蛋,两种情况:蛋碎 或者 蛋未碎.最坏情况下选两种情况的最大值
-//                    brokenCase = state[egg - 1][drop - 1];         //eggs broken (worst case minimum number)
-//                    notBrokenCase = state[egg][floor - drop];      //eggs not broken (worst case minimum number)
-//                    if (brokenCase > notBrokenCase) {
-//                        result = Math.min(result, brokenCase + 1); //count this time that has been thrown
-//                    }else {
-//                        result = Math.min(result, notBrokenCase + 1);//count this time that has been thrown
-//                    }
-//                }
                 state[egg][floor] = result;
                 LOG.debug("state({},{})=>{}", egg, floor, result);
             }

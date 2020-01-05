@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 public class ThrowEggLoopDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopDP.class);
-    private static int f[][] = null;
+    private int f[][] = null;
     private static long count = 0L;
 
     /**
@@ -34,8 +34,8 @@ public class ThrowEggLoopDP implements ThrowEggDP {
         if (null == f) {
             f = new int[eggs + 1][floors + 1];
 
-            for (int i = 1; i <= eggs; i++) {
-                for (int j = 1; j <= floors; j++) {
+            for (int i = 0; i <= eggs; i++) {
+                for (int j = 0; j <= floors; j++) {
                     f[i][j] = floors;
                     count++;
                 }
@@ -43,6 +43,7 @@ public class ThrowEggLoopDP implements ThrowEggDP {
 
             for (int i = 0; i <= eggs; i++) {
                 f[i][0] = 0;
+                f[i][1] = 1;
                 count++;
             }
 
@@ -66,7 +67,7 @@ public class ThrowEggLoopDP implements ThrowEggDP {
             int tmp;
             for (int i = 2; i <= eggs; i++) {
                 for (int j = 1; j <= floors; j++) {
-                    tmp = j;
+                    tmp = Integer.MAX_VALUE;
                     for (int w = 1; w <= j; w++) {
                         count++;
                         tmp = Math.min(tmp,
@@ -92,21 +93,4 @@ public class ThrowEggLoopDP implements ThrowEggDP {
     public long getCount() {
         return count;
     }
-
-    private void dumpMatrix(int f[][]) {
-        StringBuilder builder = new StringBuilder(1024);
-        builder.append("[\n");
-        Arrays.asList(f).stream().forEach(row -> {
-            for (int i = 0; i < row.length; i++) {
-                if (i > 0) {
-                    builder.append(",");
-                }
-                builder.append(String.format("%4d", row[i]));
-            }
-            builder.append("\n");
-        });
-        builder.append("]");
-        LOG.debug("f={}", builder.toString());
-    }
-
 }

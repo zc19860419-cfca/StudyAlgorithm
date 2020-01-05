@@ -52,7 +52,7 @@ public class EditDistanceBenchmark {
                 .measurementIterations(3)//然后执行n遍测试(measurementIterations(n))
                 //.exclude("idleTest")
                 .resultFormat(ResultFormatType.JSON)
-                .result("EditDistance.json")
+                .result("TestData/EditDistance.json")
                 .build();
         new Runner(opt).run();
     }

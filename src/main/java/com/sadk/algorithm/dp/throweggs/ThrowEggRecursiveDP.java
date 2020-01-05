@@ -6,10 +6,10 @@ import com.sadk.algorithm.utils.Args;
 
 /**
  * @Author: zhangchong
- * @Description:
+ * @Description:递归版本实现
  */
-public class ThrowEggSimpleDP implements ThrowEggDP {
-    private static final Logger LOG = LoggerFactory.getLogger(ThrowEggSimpleDP.class);
+public class ThrowEggRecursiveDP implements ThrowEggDP {
+    private static final Logger LOG = LoggerFactory.getLogger(ThrowEggRecursiveDP.class);
     private static long count = 0L;
 
     /**

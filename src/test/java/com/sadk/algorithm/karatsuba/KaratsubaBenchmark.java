@@ -60,7 +60,7 @@ public class KaratsubaBenchmark {
                 .warmupIterations(5)
                 .measurementIterations(10)
                 .resultFormat(ResultFormatType.JSON)
-                .result("Karatsuba.json")
+                .result("TestData/Karatsuba.json")
                 .build();
         new Runner(options).run();
     }
