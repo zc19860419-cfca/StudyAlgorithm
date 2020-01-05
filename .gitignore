@@ -31,4 +31,5 @@ build/
 .vscode/
 
 ### TestData###
+TestData/
 *.json
