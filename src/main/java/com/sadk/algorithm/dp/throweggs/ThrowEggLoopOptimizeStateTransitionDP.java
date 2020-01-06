@@ -7,7 +7,7 @@ import com.sadk.algorithm.utils.Debugger;
 
 /**
  * @Author: zhangchong
- * @Description: 循环版本的二分搜索优化
+ * @Description: 优化状态转移方程
  */
 public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopOptimizeStateTransitionDP.class);
@@ -23,6 +23,76 @@ public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
      * dp(1,j)=j (j>=0)
      * dp(i,0)=0 (i>=0)
      * dp(i,1)=1 (i>=0)
+     * </p>
+     *
+     *
+     * <pre>
+     * f(i,j) = min{max{f(i-1,w-1),f(i,j-w)}+1|1<=w<=j}             ①
+     *      min{max{
+     *          f(i-1,0) f(i-1,1) ... f(i-1,j-1)
+     *          f(i,j-1) f(i,j-2) ... f(i,0)
+     *      }}
+     *
+     * f(i,j) >= f(i,j-1)                                             ②
+     *      f(i,j) = min{max{f(i-1,w-1),f(i,j-w)}+1|1<=w<=j}
+     *      f(i,j) <= max{f(i-1,w-1),f(i,j-w)}+1|1<=w<=j
+     *      令w=1,则  f(i,j) <= max{f(i-1,0),f(i,j-1)}+1=f(i,j-1)+1
+     *      即 f(i,j)<=f(i,j-1)+1 (j>=1)
+     *
+     * f(i,j) <= f(i,j-1)+1 (j>=1)                                    ③
+     *      又∵f(i,j)>=f(i,j-1), ∴ f(i,j-1)<=f(i,j)<=f(i,j-1)+1
+     *      推理出:
+     *          若某个决策 w 可以使 f(i,j)=f(i,j-1),则 f(i,j)取最小值 => f(i,j)=f(i,j-1)
+     *          若所有决策 w 都不能使 f(i,j)=f(i,j-1),则 f(i,j)取最大值 => f(i,j)=f(i,j-1)+1 (且必存在这样的 w 使得 f(i,j)=f(i,j-1)+1)
+     *      由此设指针 p 满足:
+     *      f(i,p) < f(i,j-1) 且 f(i,p+1)=f(i,j-1);
+     *          f(i,p)=f(i,j-1)-1
+     *          f(i,p+1)=f(i,p+2)=...=f(i,j-1)
+     *      在计算f(i,j)时,令p=j-w => w=j-p
+     *      令 tmp=max{f(i-1,w-1),f(i,j-w)}+1 => tmp=max{f(i-1,j-p-1),f(i,p)}+1
+     *      Case1.若 f(i,p)>=f(i-1,j-p-1) => tmp=f(i,p)+1=f(i,j-1)-1+1=f(i,j-1) =>tmp=f(i,j-1)
+     *      这说明当前决策 w 可以使得 f(i,j)=f(i,j-1) ∴f(i,j)=f(i,j-1)
+     *
+     *      Case2.若 f(i,p)<f(i-1,j-p-1) => tmp=f(i-1,j-p-1)+1
+     *          Case2.1 当 p'<p 时
+     *          必有 f(i-1,j-p'-1)>=f(i-1,j-p-1)>f(i,p)
+     *          ∴ max{f(i,p'),f(i-1,j-p'-1)}+1 >= f(i-1,j-p'-1)+1 >= f(i-1,j-p-1)+1 > f(i,p)+1=f(i,j-1)
+     *          即 max{f(i,p'),f(i-1,j-p'-1)}+1 > f(i,j-1) =>  max{f(i,p'),f(i-1,j-p'-1)}+1 >= f(i,j-1)+1
+     *          f(i,j)>=max{f(i,p'),f(i-1,j-p'-1)}+1>= f(i,j-1)+1
+     *          综上:f(i,j)>=f(i,j-1)+1 无法使得 f(i,j)=f(i,j-1)
+     *
+     *          Case2.1 当 p'=p 时
+     *          max{f(i,p'),f(i-1,j-p'-1)}+1 >= f(i-1,j-p'-1)+1 > f(i,p')+1 = f(i,p)+1=f(i,j-1)
+     *          即 max{f(i,p'),f(i-1,j-p'-1)}+1 > f(i,j-1) =>  max{f(i,p'),f(i-1,j-p'-1)}+1 >= f(i,j-1)+1
+     *          f(i,j)>=max{f(i,p'),f(i-1,j-p'-1)}+1>= f(i,j-1)+1
+     *          综上:f(i,j)>=f(i,j-1)+1 无法使得 f(i,j)=f(i,j-1)
+     *
+     *          Case2.3 当 p'>p 时
+     *          必有 f(i,p')>f(i,p),此时 f(i,p')=f(i,j-1)
+     *          max{f(i,p'),f(i-1,j-p'-1)}+1 >= f(i,p')+1 =f(i,j-1)+1
+     *          f(i,j)>=max{f(i,p'),f(i-1,j-p'-1)}+1>= f(i,j-1)+1
+     *          综上:f(i,j)>=f(i,j-1)+1 无法使得 f(i,j)=f(i,j-1)
+     *      综上:当f(i,p)<f(i-1,j-p-1)时,任何决策都不能使得 f(i,j)=f(i,j-1),所以此时f(i,j)=f(i,j-1)+1
+     *
+     *      因此,只需要确定f(i,p) 与 f(i-1,j-p-1) 的大小关系便可直接确定 f(i,j) 的取值
+     *      注意:
+     *          1.f(i,1)需要特殊处理,即令 f(i,1)=1 因为p初值为0,并不满足 f(i,p)=f(i,j-1)-1
+     *          2.若f(i,j)=f(i,j-1)+1,则将p 赋值为 j-1
+     *
+     *
+     *      f(i,j)=min{max{
+     *          f(i-1,0) f(i-1,1)   ...   f(i-1,j-2)  f(i-1,j-1)
+     *       =>[                 ...     f(i-1,p')  ]    | [ f(i-1,p'+1)...f(i-1,j-1)]
+     *                                     |                       |
+     *         [<=f(i-1,j-1)-1 area  =f(i-1,j-1)-1 area] | [  =f(i-1,j-1) area    ]
+     *
+     *          f(i,0)   f(i,1)     ...   f(i,j-2)    f(i,j-1)
+     *       =>[                 ...     f(i,p)    ] | [ f(i,p+1)...f(i,j-1)]
+     *                                     |                 |
+     *         [<=f(i,j-1)-1 area  =f(i,j-1)-1 area] | [  =f(i,j-1) area    ]
+     *      }}
+     *      一旦找到 p 点,后续都不用算,所以状态迁移时间复杂度为O(1)
+     * </pre>
      *
      * @param eggs   给定鹰蛋个数
      * @param floors 给定楼层
@@ -71,7 +141,8 @@ public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
 
     /**
      * 初始化状态转移矩阵 egg 和 floor 0以及1的情况都已经考虑 后续将忽略
-     *  @param eggs
+     *
+     * @param eggs
      * @param floors
      */
     private int[][] initializeStateTransitionMatrix(int eggs, int floors) {
