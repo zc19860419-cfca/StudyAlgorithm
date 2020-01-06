@@ -6,5 +6,5 @@ package com.sadk.algorithm.bruteForce;
  * @Description
  */
 public interface CharListReadyFunc {
-    void onCharListReady(CharItem[] ci, String minuendStr, String subtrahendStr, String diffStr);
+    boolean onCharListReady(CharItem[] ci, String minuendStr, String subtrahendStr, String diffStr);
 }

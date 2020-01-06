@@ -3,6 +3,8 @@ package com.sadk.algorithm.bruteForce;
 import cfca.org.slf4j.Logger;
 import cfca.org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 /**
  * @author zhangchong
  * @CodeReviewer
@@ -17,15 +19,19 @@ public class CharListReadyFuncImpl implements CharListReadyFunc {
      *
      * @param ci
      */
-    public void onCharListReady(CharItem[] ci, String minuendStr, String subtrahendStr, String diffStr) {
-//        logger.info("ci={}", Arrays.toString(ci));
+    public boolean onCharListReady(CharItem[] ci, String minuendStr, String subtrahendStr, String diffStr) {
+        if (logger.isDebugEnabled()){
+            logger.debug("ci={}", Arrays.toString(ci));
+        }
+        boolean result = false;
         int minuend = makeInt(minuendStr, ci);
         int subtrahend = makeInt(subtrahendStr, ci);
         int diff = makeInt(diffStr, ci);
         if (minuend - subtrahend == diff) {
             logger.info("{}-{}={}", minuend, subtrahend, diff);
+            result = true;
         }
-
+        return result;
     }
 
     private int makeInt(String s, CharItem[] ci) {

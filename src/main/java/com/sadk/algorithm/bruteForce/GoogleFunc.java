@@ -15,10 +15,11 @@ public class GoogleFunc {
      */
     private static final int MAX_NUMBER_COUNT = 10;
 
+    private final FixValuePruner fixValuePruner;
     private final String minuendStr;
     private final String subtrahendStr;
     private final String diffStr;
-    private static final CharValue[] CHAR_VALUES = new CharValue[]{
+    public static final CharValue[] CHAR_VALUES = new CharValue[]{
             new CharValue(false, 0),
             new CharValue(false, 1),
             new CharValue(false, 2),
@@ -31,36 +32,46 @@ public class GoogleFunc {
             new CharValue(false, 9),
     };
 
-    public GoogleFunc(String minuendStr, String subtrahendStr, String diffStr) {
+    public GoogleFunc(String minuendStr, String subtrahendStr, String diffStr, FixValuePruner fixValuePruner) {
         this.minuendStr = minuendStr;
         this.subtrahendStr = subtrahendStr;
         this.diffStr = diffStr;
+        this.fixValuePruner = fixValuePruner;
 
-        logger.info("{}-{}={}", minuendStr, subtrahendStr, diffStr);
+        logger.debug("{}-{}={}", minuendStr, subtrahendStr, diffStr);
     }
 
-    public void search(CharItem[] ci, int index, CharListReadyFunc callback) {
+    public boolean search(CharItem[] ci, int index, CharListReadyFunc callback) {
+        boolean result = false;
         if (index == ci.length) {
-            callback.onCharListReady(ci, minuendStr, subtrahendStr, diffStr);
-            return;
+            result = callback.onCharListReady(ci, minuendStr, subtrahendStr, diffStr);
         }
-
-        for (int i = 0; i < MAX_NUMBER_COUNT; i++) {
-            if (isValueValid(ci[index], CHAR_VALUES[i])) {
+        boolean tmpResult;
+        for (int i = 0; i < MAX_NUMBER_COUNT && index < ci.length; i++) {
+            if (isValueValid(ci, index, CHAR_VALUES[i])) {
                 CHAR_VALUES[i].used = true;
                 ci[index].value = CHAR_VALUES[i].value;
-                search(ci, index + 1, callback);
+                tmpResult = search(ci, index + 1, callback);
+                if (tmpResult) {
+                    result = tmpResult;
+                }
                 CHAR_VALUES[i].used = false;
             }
         }
+        return result;
     }
 
-    private boolean isValueValid(CharItem charItem, CharValue charValue) {
+    private boolean isValueValid(CharItem[] ci, int index, CharValue charValue) {
         boolean result = false;
         if (!charValue.used) {
-            result = (charItem.leading && charValue.value != 0) || !charItem.leading;
+            if (index < ci.length) {
+                final CharItem charItem = ci[index];
+                result = (charItem.leading && charValue.value != 0) || !charItem.leading;
+                if (result){
+                    fixValuePruner.pruning(ci, index);
+                }
+            }
         }
-
         return result;
     }
 }
