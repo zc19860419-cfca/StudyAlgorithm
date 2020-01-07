@@ -127,4 +127,11 @@ public class ThrowEggDPTest {
         throwEggDP = new ThrowEggLoopDP();
         System.out.println(throwEggDP.dp(3, 100));
     }
+
+    @Test
+    public void dp_ThrowEggLoopNewFunctionDP() {
+        ThrowEggDP throwEggDP = new ThrowEggLoopNewFunctionDP();
+        System.out.println(throwEggDP.dp(3, 100));
+    }
+
 }
