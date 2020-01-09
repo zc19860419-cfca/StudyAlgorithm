@@ -13,8 +13,8 @@ import java.util.Arrays;
  */
 public class ThrowEggLoopDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopDP.class);
-    private int f[][] = null;
-    private static long count = 0L;
+    private long f[][] = null;
+    private long count = 0L;
 
     /**
      * 状态定义即为用i个蛋在j层楼上最坏情况下确定E所需要的最少次数，记为dp(i,j)。
@@ -28,11 +28,11 @@ public class ThrowEggLoopDP implements ThrowEggDP {
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
     @Override
-    public int dp(int eggs, int floors) {
+    public long dp(int eggs, int floors) {
         Args.notNegative(eggs, "eggs");
         Args.notNegative(floors, "floors");
         if (null == f) {
-            f = new int[eggs + 1][floors + 1];
+            f = new long[eggs + 1][floors + 1];
 
             for (int i = 0; i <= eggs; i++) {
                 for (int j = 0; j <= floors; j++) {
@@ -58,13 +58,13 @@ public class ThrowEggLoopDP implements ThrowEggDP {
             }
         }
 
-        int res;
+        long res;
         if (1 == eggs) {
             res = f[eggs][floors];
         } else if (0 == floors) {
             res = f[eggs][floors];
         } else {
-            int tmp;
+            long tmp;
             for (int i = 2; i <= eggs; i++) {
                 for (int j = 1; j <= floors; j++) {
                     tmp = Integer.MAX_VALUE;

@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class Debugger {
 
-    public static void dumpMatrix(int f[][], Logger logger) {
+    public static void dumpMatrix(long f[][], Logger logger) {
         StringBuilder builder = new StringBuilder(1024);
         builder.append("[\n");
         Arrays.asList(f).stream().forEach(row -> {

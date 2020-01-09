@@ -11,15 +11,15 @@ import com.sadk.algorithm.utils.Debugger;
  */
 public class ThrowEggRecursiveBinarySearchDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggRecursiveBinarySearchDP.class);
-    private static int f[][] = null;
+    private static long f[][] = null;
     private static long count = 0L;
 
     public ThrowEggRecursiveBinarySearchDP(int eggs, int floors){
-        f = new int[eggs + 1][floors + 1];
+        f = new long[eggs + 1][floors + 1];
 
         for (int i = 1; i <= eggs; i++) {
             for (int j = 1; j <= floors; j++) {
-                f[i][j] = Integer.MAX_VALUE;
+                f[i][j] = Long.MAX_VALUE;
                 count++;
             }
         }
@@ -53,21 +53,21 @@ public class ThrowEggRecursiveBinarySearchDP implements ThrowEggDP {
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
     @Override
-    public int dp(int eggs, int floors) {
+    public long dp(int eggs, int floors) {
         Args.notNegative(eggs, "eggs");
         Args.notNegative(floors, "floors");
         count++;
 
-        int res = Integer.MAX_VALUE;
-        if (Integer.MAX_VALUE != f[eggs][floors]) {
+        long res = Long.MAX_VALUE;
+        if (Long.MAX_VALUE != f[eggs][floors]) {
             res = f[eggs][floors];
         } else {
             //用二分搜索代替线性搜索
             int low = 1;
             int high = floors;
             int mid;
-            int brokenCase;
-            int notBrokenCase;
+            long brokenCase;
+            long notBrokenCase;
             while (low <= high) {
                 mid = low + (high - low) / 2;                   // throw egg at mid-th floor
                 brokenCase = dp(eggs - 1, mid - 1);  // eggs broken in mid-th floor(worst case minimum number)

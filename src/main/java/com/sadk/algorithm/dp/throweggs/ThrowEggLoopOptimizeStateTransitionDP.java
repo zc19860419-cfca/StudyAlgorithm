@@ -11,8 +11,8 @@ import com.sadk.algorithm.utils.Debugger;
  */
 public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopOptimizeStateTransitionDP.class);
-    private int state[][];
-    private static long count = 0L;
+    private long state[][];
+    private long count = 0L;
 
     /**
      * 状态定义即为用i个蛋在j层楼上最坏情况下确定E所需要的最少次数，记为dp(i,j)。
@@ -99,14 +99,14 @@ public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
     @Override
-    public int dp(int eggs, int floors) {
+    public long dp(int eggs, int floors) {
         Args.notNegative(eggs, "eggs");
         Args.notNegative(floors, "floors");
         this.state = initializeStateTransitionMatrix(eggs, floors);
         //第三步状态方程
-        int result;
-        int brokenCase;
-        int notBrokenCase;
+        long result;
+        long brokenCase;
+        long notBrokenCase;
         int low;
         int high;
         int drop;
@@ -145,9 +145,9 @@ public class ThrowEggLoopOptimizeStateTransitionDP implements ThrowEggDP {
      * @param eggs
      * @param floors
      */
-    private int[][] initializeStateTransitionMatrix(int eggs, int floors) {
+    private long[][] initializeStateTransitionMatrix(int eggs, int floors) {
         //第一步创建备忘录
-        int state[][] = new int[eggs + 1][floors + 1];
+        long state[][] = new long[eggs + 1][floors + 1];
 
         for (int i = 0; i <= eggs; i++) {
             for (int j = 0; j <= floors; j++) {

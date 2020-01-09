@@ -3,6 +3,7 @@ package com.sadk.algorithm.dp.throweggs;
 import cfca.org.slf4j.Logger;
 import cfca.org.slf4j.LoggerFactory;
 import com.sadk.algorithm.utils.Args;
+import com.sadk.algorithm.utils.Debugger;
 
 /**
  * @Author: zhangchong
@@ -10,8 +11,8 @@ import com.sadk.algorithm.utils.Args;
  */
 public class ThrowEggLoopNewFunctionDP implements ThrowEggDP {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggLoopNewFunctionDP.class);
-    private int state[][];
-    private static long count = 0L;
+    private long state[][];
+    private long count = 0L;
 
     /**
      * 状态定义即为 用 j 个蛋尝试i次在最坏情况下能确定E 的最高楼层数,定义为g(i,j)
@@ -50,11 +51,26 @@ public class ThrowEggLoopNewFunctionDP implements ThrowEggDP {
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
     @Override
-    public int dp(int eggs, int floors) {
+    public long dp(int eggs, int floors) {
         Args.notNegative(eggs, "eggs");
         Args.notNegative(floors, "floors");
+        if (0 == eggs) {
+            count++;
+            return 0;
+        }
+
+        if (1 == eggs) {
+            count++;
+            return floors;
+        }
+
+        if (1 == floors || 0 == floors) {
+            count++;
+            return floors;
+        }
+
         //第一步创建备忘录,采用滚动数组
-        state = new int[floors + 1][eggs + 1];
+        state = new long[floors + 1][eggs + 1];
 
         //第二步考虑边界
         //鹰蛋边界
@@ -66,17 +82,14 @@ public class ThrowEggLoopNewFunctionDP implements ThrowEggDP {
         //g(0,0)=0
         for (int times = 0; times <= floors; times++) {
             state[times][1] = times;//g(0,1)=0
-            state[times][0] = 0;//g(0,0)=0
+            state[times][0] = 0;//g(0,0)=0 g(1,0)=0
             count++;
         }
 
         //尝试次数边界
-        //无论有多少鹰蛋,若只试 1 次都只能确定高度为 1  的楼
-        //g(1,j)=1(j>=1)
-        //g(1,0)=0
-        state[1][0] = 0;
-        count++;
-        //无论有多少鹰蛋,若只试 0 次都只能确定高度为 0  的楼
+        //无论有多少鹰蛋,若只试 1 次都只能确定高度为 1 的楼
+        //g(1,j)=1(j>=1) g(1,0)=0
+        //无论有多少鹰蛋,若只试 0 次都只能确定高度为 0 的楼
         //g(0,j)=0(j>=1)
         for (int egg = 1; egg <= eggs; egg++) {
             //g(1,j)=1(j>=1)
@@ -85,44 +98,53 @@ public class ThrowEggLoopNewFunctionDP implements ThrowEggDP {
             count++;
         }
 
+        //g(i,j)=g(i-1,j-1)+g(i-1,j)+1  (j>1)
+        for (int times = 2; times <= floors; times++) {
+            for (int egg = 2; egg <= eggs; egg++) {
+                state[times][egg] = state[times - 1][egg - 1] + state[times - 1][egg] + 1;
+                count++;
+            }
+        }
+
+        if (LOG.isDebugEnabled()){
+            Debugger.dumpMatrix(state, LOG);
+        }
+//        StringBuilder builder = new StringBuilder();
+//        builder.append('[');
+//        for (int i = 0; i < floors; i++) {
+//            if (i > 0) {
+//                builder.append(',');
+//            }
+//            if (0 == i % 10) {
+//                builder.append('\n');
+//            }
+//            builder.append(String.format("%10d", state[i][eggs]));
+//        }
+//        builder.append(']');
+//        LOG.debug("{}", builder.toString());
+
+
         //第三步状态方程
         int low = 1;
-        int high = eggs;
+        int high = floors;
         int mid;
-        int currentFloor;
-        int nextFloor;
-        int result = floors;
-        int currentFloorBrokenCase;
-        int currentFloorNonBrokenCase;
-        int nextFloorBrokenCase;
-        int nextFloorNonBrokenCase;
-        boolean found = false;
-        for (int time = 1; time < floors; time++) {
-            while (low < high) {
-                count++;
-                mid = low + (high - low) / 2;
-                currentFloorBrokenCase = state[time - 1][eggs - 1];
-                currentFloorNonBrokenCase = state[time - 1][eggs];
-                currentFloor = state[time][eggs] = currentFloorBrokenCase + currentFloorNonBrokenCase + 1;//currentTime
-                // state(time+1,eggs)=state(time,eggs-1)+state(time,eggs)+1
-                // to find the time To meet the conditions:
-                // state[time][eggs]<floors && state[time + 1][eggs]>=floors,then the time value is the answer
-                nextFloorBrokenCase = state[time][eggs - 1];
-                nextFloorNonBrokenCase = state[time][eggs];
-                nextFloor = state[time + 1][eggs] = nextFloorBrokenCase + nextFloorNonBrokenCase + 1;//currentTime
-                if (currentFloor < floors && nextFloor >= floors) {
-                    found = true;
-                    result = time;
-                    break;
-                }
-                if (currentFloor >= floors) {
-                    high = mid - 1;
-                } else if (nextFloor < floors) {
-                    low = mid + 1;
-                }
-            }
-            if (found) {
+        long lastFloor;
+        long currentFloor;
+        long result = floors;
+        while (low < high) {
+            count++;
+            mid = low + (high - low) / 2;
+            lastFloor = state[mid - 1][eggs];
+            currentFloor = state[mid][eggs];
+            // state[mid - 1][eggs]<floors && state[mid][eggs]>=floors,then the mid value is the answer
+            if (lastFloor < floors && currentFloor >= floors) {
+                result = mid;
                 break;
+            }
+            if (lastFloor >= floors) {
+                high = mid - 1;
+            } else if (currentFloor < floors) {
+                low = mid + 1;
             }
         }
 

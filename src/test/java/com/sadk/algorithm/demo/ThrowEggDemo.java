@@ -13,7 +13,7 @@ public class ThrowEggDemo {
     private static final Logger LOG = LoggerFactory.getLogger(ThrowEggDemo.class);
     public static void main(String[] args) {
         ThrowEggDP throwEggDP = new ThrowEggLoopBinarySearchDP();
-        final int result = throwEggDP.dp(3, 10000);
+        final long result = throwEggDP.dp(3, 10000);
         LOG.info("min={},count={}", result, throwEggDP.getCount());
     }
 }
