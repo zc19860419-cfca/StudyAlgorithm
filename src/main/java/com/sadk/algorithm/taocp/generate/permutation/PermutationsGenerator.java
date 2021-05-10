@@ -6,5 +6,5 @@ package com.sadk.algorithm.taocp.generate.permutation;
  * @Description 所有排列生成器
  */
 public interface PermutationsGenerator<T> {
-    T[] generator(T[] a);
+    T[] next();
 }
