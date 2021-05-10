@@ -24,10 +24,10 @@ public class ThrowEggRecursiveDP implements ThrowEggDP {
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
     @Override
-    public int dp(int eggs, int floors) {
+    public long dp(int eggs, int floors) {
         Args.notNegative(eggs, "eggs");
         Args.notNegative(floors, "floors");
-        int res = floors;
+        long res = floors;
         count++;
         if (1 == eggs) {
             res = floors;

@@ -15,7 +15,7 @@ public interface ThrowEggDP {
      * @param floors 给定楼层
      * @return 最坏情况下确定鸡蛋坚硬度E所需要的最少次数
      */
-    int dp(int eggs, int floors);
+    long dp(int eggs, int floors);
 
     /**
      * 获取计算时间复杂度的操作次数
