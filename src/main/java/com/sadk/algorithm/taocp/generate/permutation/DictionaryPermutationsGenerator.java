@@ -1,8 +1,10 @@
 package com.sadk.algorithm.taocp.generate.permutation;
 
 import com.sadk.algorithm.utils.Args;
+import com.sadk.algorithm.utils.ArraysUtils;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author zhangchong
@@ -13,7 +15,9 @@ public class DictionaryPermutationsGenerator implements PermutationsGenerator<In
 
     private final int[] data;
     private final int n;
+    private int count = 0;
     private boolean end = false;
+    private boolean debug = false;
 
     public DictionaryPermutationsGenerator(Integer[] org) {
         Args.check(org != null, "forbidden org null");
@@ -30,10 +34,11 @@ public class DictionaryPermutationsGenerator implements PermutationsGenerator<In
     @Override
     public Integer[] next() {
         if (end) {
-            return Arrays.stream(data).boxed().toArray(Integer[]::new);
+            throw new NoSuchElementException("no more permutation[" + count + "]");
         }
         if (n <= 2) {
-            swap(data, 0, 1);
+            ArraysUtils.swap(data, 0, 1);
+            end = true;
         } else {
             int j = n - 2;
             while (data[j] >= data[j + 1]) {
@@ -42,37 +47,47 @@ public class DictionaryPermutationsGenerator implements PermutationsGenerator<In
                     break;
                 }
             }
+            //  找到第一个升序相邻对 data[j] < data[j + 1]，从而得知右侧的所有相邻对都是降序 data[j + 1] 是峰值
 
-            if (j > -1) {
-                int l = n - 1;
-                while (data[j] >= data[l]) {
-                    l = l - 1;
-                }
-                //data[j] < data[l]
-                swap(data, j, l);
-//                System.out.println(Arrays.toString(data));
-                int k = j + 1;
-                l = n - 1;
-                while (k < l) {
-                    swap(data, k, l);
-//                    System.out.println(Arrays.toString(data));
-                    k = k + 1;
-                    l = l - 1;
-                }
-                //k>=l
-            } else {
+            if (j <= -1) {
                 end = true;
+                throw new NoSuchElementException("no more permutation[" + count + "]");
             }
-        }
-        return Arrays.stream(data).boxed().toArray(Integer[]::new);
-    }
+            int nMinus1 = n - 1;
+            int l = nMinus1;
+            while (data[j] >= data[l]) {
+                l = l - 1;
+            }
+//              data[n-1] <= ... <= data[l+1] <= data[j] < data[l] <= data[l-1] <= ... <=data[j+1]
+            ArraysUtils.swap(data, j, l);
+//              data[n-1] <= ... <= data[l+1] <= data[l] < data[j] <= data[l-1] <= ... <=data[j+1]
+            if (debug) {
+                System.out.println("[" + count + "] after  3:" + Arrays.toString(data));
+            }
+            int k = j + 1;
+            l = nMinus1;
+            int debugk = 0;
+            int debugl = 0;
+            if (debug) {
+                debugk = k;
+                debugl = l;
+                System.out.println("[" + count + "] before 4:" + ArraysUtils.toString(data, debugk, debugl));
+            }
 
-    private void swap(int[] array, int j, int l) {
-        if (array == null || array.length == 0 || j >= array.length || l >= array.length) {
-            return;
+            while (k < l) {
+                ArraysUtils.swap(data, k, l);
+                k = k + 1;
+                l = l - 1;
+            }
+            if (debug) {
+                System.out.println("[" + count + "] after  4:" + ArraysUtils.toString(data, debugk, debugl));
+            }
+            //k>=l
         }
-        array[j] ^= array[l];
-        array[l] ^= array[j];
-        array[j] ^= array[l];
+        if (debug) {
+            System.out.println("[" + count + "] final:" + Arrays.toString(data));
+        }
+        count++;
+        return Arrays.stream(data).boxed().toArray(Integer[]::new);
     }
 }

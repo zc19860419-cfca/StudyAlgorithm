@@ -76,14 +76,14 @@ public class SimpleBinarySearch5Benchmark {
     public void search() {
         final BinarySearch simpleBinarySearch = new SimpleBinarySearch5();
         final int found = simpleBinarySearch.search(values, 4);
-//        System.out.println(found);
+        System.out.println(found);
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(SimpleBinarySearch5Benchmark.class.getSimpleName())//找寻指定类中Benchmark注解的方法来测试
                 .forks(1)//使用n个进程(forks(n))执行测试
-                .threads(1)//使用n个线程(threads(n))执行测试
+                .threads(4)//使用n个线程(threads(n))执行测试
                 .warmupIterations(5)//执行N遍warmup(warmupIterations(N))
                 .measurementIterations(5)//然后执行n遍测试(measurementIterations(n))
                 .resultFormat(ResultFormatType.JSON)
